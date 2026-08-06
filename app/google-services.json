@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:43016729698:android:a9cc7a4c5b7d9c5f71cd3b",
+        "mobilesdk_app_id": "1:43016729698:android:616e1ac09ae2d2bf71cd3b",
         "android_client_info": {
-          "package_name": "com.scs3311.smarthome"
+          "package_name": "com.scs3311.smart_home_monitoring_app"
         }
       },
       "oauth_client": [],

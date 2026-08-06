@@ -1,0 +1,86 @@
+{
+  "connectionTest": {
+    "message": "Android connected",
+    "updatedAt": 0,
+    "lastAndroidWrite": 0
+  },
+  "homes": {
+    "home1": {
+      "name": "My Smart Home",
+      "floors": {
+        "floor_ground": { "name": "Ground Floor" },
+        "floor_first": { "name": "First Floor" }
+      },
+      "rooms": {
+        "room_living": { "name": "Living Room", "floorId": "floor_ground", "gridRow": 0, "gridCol": 0, "rowSpan": 2, "colSpan": 2 },
+        "room_kitchen": { "name": "Kitchen", "floorId": "floor_ground", "gridRow": 0, "gridCol": 2, "rowSpan": 1, "colSpan": 1 },
+        "room_bath_g": { "name": "Bathroom", "floorId": "floor_ground", "gridRow": 1, "gridCol": 2, "rowSpan": 1, "colSpan": 1 },
+        "room_bed1": { "name": "Bedroom 1", "floorId": "floor_first", "gridRow": 0, "gridCol": 0, "rowSpan": 1, "colSpan": 2 },
+        "room_bed2": { "name": "Bedroom 2", "floorId": "floor_first", "gridRow": 1, "gridCol": 0, "rowSpan": 1, "colSpan": 1 },
+        "room_hall": { "name": "Hall", "floorId": "floor_first", "gridRow": 1, "gridCol": 1, "rowSpan": 1, "colSpan": 1 }
+      },
+      "devices": {
+        "dev_living_light": {
+          "name": "Living Room Light", "type": "LIGHT", "roomId": "room_living", "floorId": "floor_ground", "status": "OFF", "gridRow": 0, "gridCol": 0, "isSafetyCritical": false,
+          "lightSchedule": { "turnOnHour": 18, "turnOnMinute": 0, "turnOffHour": 23, "turnOffMinute": 0, "enabled": false }
+        },
+        "dev_living_panel": {
+          "name": "Living Room Switch Panel", "type": "MULTI_SWITCH", "roomId": "room_living", "floorId": "floor_ground", "status": "ON", "gridRow": 1, "gridCol": 1, "isSafetyCritical": false,
+          "switches": {
+            "sw1": { "name": "Main Light", "status": "OFF" },
+            "sw2": { "name": "Ceiling Fan", "status": "OFF" },
+            "sw3": { "name": "TV Outlet", "status": "ON" }
+          }
+        },
+        "dev_living_cam": {
+          "name": "Living Room Camera", "type": "CAMERA", "roomId": "room_living", "floorId": "floor_ground", "status": "ON", "gridRow": 0, "gridCol": 1, "isSafetyCritical": false,
+          "cameraSnapshotUrl": "https://picsum.photos/seed/livingroom/800/600"
+        },
+        "dev_kitchen_outlet1": {
+          "name": "Fridge Outlet", "type": "OUTLET", "roomId": "room_kitchen", "floorId": "floor_ground", "status": "ON", "gridRow": 0, "gridCol": 0, "isSafetyCritical": false,
+          "turnedOnAtMillis": 1786000000000
+        },
+        "dev_kitchen_outlet2": {
+          "name": "Microwave Outlet", "type": "OUTLET", "roomId": "room_kitchen", "floorId": "floor_ground", "status": "OFF", "gridRow": 0, "gridCol": 1, "isSafetyCritical": false
+        },
+        "dev_bath_light": {
+          "name": "Bathroom Light", "type": "LIGHT", "roomId": "room_bath_g", "floorId": "floor_ground", "status": "OFF", "gridRow": 0, "gridCol": 0, "isSafetyCritical": false,
+          "lightSchedule": { "turnOnHour": 18, "turnOnMinute": 0, "turnOffHour": 23, "turnOffMinute": 0, "enabled": false }
+        },
+        "dev_bed1_light": {
+          "name": "Bedroom 1 Light", "type": "LIGHT", "roomId": "room_bed1", "floorId": "floor_first", "status": "OFF", "gridRow": 0, "gridCol": 0, "isSafetyCritical": false,
+          "lightSchedule": { "turnOnHour": 6, "turnOnMinute": 0, "turnOffHour": 22, "turnOffMinute": 30, "enabled": false }
+        },
+        "dev_bed1_iron": {
+          "name": "Clothing Iron", "type": "IRON", "roomId": "room_bed1", "floorId": "floor_first", "status": "OFF", "gridRow": 0, "gridCol": 1, "isSafetyCritical": true,
+          "maxOnDurationMinutes": 1
+        },
+        "dev_bed1_outlet": {
+          "name": "Bedroom Outlet", "type": "OUTLET", "roomId": "room_bed1", "floorId": "floor_first", "status": "DISCONNECTED", "gridRow": 0, "gridCol": 2, "isSafetyCritical": false
+        },
+        "dev_bed2_panel": {
+          "name": "Bedroom 2 Switch Panel", "type": "MULTI_SWITCH", "roomId": "room_bed2", "floorId": "floor_first", "status": "ON", "gridRow": 0, "gridCol": 0, "isSafetyCritical": false,
+          "switches": {
+            "sw1": { "name": "Main Light", "status": "OFF" },
+            "sw2": { "name": "Desk Lamp", "status": "OFF" },
+            "sw3": { "name": "Fan", "status": "OFF" },
+            "sw4": { "name": "Heater", "status": "OFF" },
+            "sw5": { "name": "USB Charger", "status": "ON" }
+          }
+        },
+        "dev_bed2_light": {
+          "name": "Bedroom 2 Light", "type": "LIGHT", "roomId": "room_bed2", "floorId": "floor_first", "status": "ERROR", "gridRow": 0, "gridCol": 1, "isSafetyCritical": false
+        },
+        "dev_hall_cam": {
+          "name": "Hall Camera", "type": "CAMERA", "roomId": "room_hall", "floorId": "floor_first", "status": "ON", "gridRow": 0, "gridCol": 0, "isSafetyCritical": false,
+          "cameraSnapshotUrl": "https://picsum.photos/seed/hallcam/800/600"
+        },
+        "dev_hall_outlet": {
+          "name": "Hall Outlet", "type": "OUTLET", "roomId": "room_hall", "floorId": "floor_first", "status": "OFF", "gridRow": 0, "gridCol": 1, "isSafetyCritical": false
+        }
+      },
+      "logs": {},
+      "alerts": {}
+    }
+  }
+}
