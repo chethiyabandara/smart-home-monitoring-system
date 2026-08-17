@@ -3,6 +3,7 @@ package com.scs3311.smart_home_monitoring_app.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.scs3311.smart_home_monitoring_app.data.model.DeviceCreationRequest
 import com.scs3311.smart_home_monitoring_app.data.model.Floor
 import com.scs3311.smart_home_monitoring_app.data.model.HomeState
 import com.scs3311.smart_home_monitoring_app.data.model.SafetyAlert
@@ -27,6 +28,30 @@ class HomeViewModel(private val repository: SmartHomeRepository) : ViewModel() {
 
     fun selectFloor(floorId: String) {
         selectedFloorId = floorId
+    }
+
+    fun createFloor(name: String, onCreated: (String) -> Unit = {}) {
+        viewModelScope.launch {
+            val floorId = repository.createFloor(name)
+            selectedFloorId = floorId
+            onCreated(floorId)
+        }
+    }
+
+    fun createRoom(
+        floorId: String,
+        name: String,
+        gridRow: Int,
+        gridCol: Int,
+        rowSpan: Int = 1,
+        colSpan: Int = 1,
+        onCreated: (String) -> Unit = {}
+    ) {
+        viewModelScope.launch { onCreated(repository.createRoom(floorId, name, gridRow, gridCol, rowSpan, colSpan)) }
+    }
+
+    fun createDevice(request: DeviceCreationRequest, onCreated: (String) -> Unit = {}) {
+        viewModelScope.launch { onCreated(repository.createDevice(request)) }
     }
 
     fun devicesForFloor(floorId: String): StateFlow<List<SmartDevice>> =

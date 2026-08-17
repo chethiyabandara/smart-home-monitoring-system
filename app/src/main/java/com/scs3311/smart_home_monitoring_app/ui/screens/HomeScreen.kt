@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
@@ -37,9 +38,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.scs3311.smart_home_monitoring_app.viewmodel.HomeViewModel
+import androidx.compose.ui.window.Dialog
 import com.scs3311.smart_home_monitoring_app.ui.components.DeviceCard
 import com.scs3311.smart_home_monitoring_app.ui.components.FloorPlanGrid
+import com.scs3311.smart_home_monitoring_app.viewmodel.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,14 +52,34 @@ fun HomeScreen(
 ) {
     val homeState by viewModel.homeState.collectAsState()
     val alerts by viewModel.alerts.collectAsState()
-    var selectedFloorId by remember { mutableStateOf(homeState.floors.firstOrNull()?.id ?: "") }
+    var selectedFloorId by remember { mutableStateOf(viewModel.selectedFloorId.ifEmpty { homeState.floors.firstOrNull()?.id.orEmpty() }) }
+    var isSetupOpen by remember { mutableStateOf(false) }
 
     if (selectedFloorId.isEmpty() && homeState.floors.isNotEmpty()) {
         selectedFloorId = homeState.floors.first().id
     }
 
+    val selectedFloor = homeState.floors.find { it.id == selectedFloorId }
     val floorDevices = homeState.devices.filter { it.floorId == selectedFloorId }
-    val floor = homeState.floors.find { it.id == selectedFloorId }
+
+    if (isSetupOpen) {
+        Dialog(onDismissRequest = { isSetupOpen = false }) {
+            HomeManagementCard(
+                floors = homeState.floors,
+                selectedFloorId = selectedFloorId,
+                onSelectFloor = { selectedFloorId = it },
+                onCreateFloor = { name ->
+                    viewModel.createFloor(name) { createdFloorId ->
+                        selectedFloorId = createdFloorId
+                    }
+                },
+                onCreateRoom = { floorId, name, gridRow, gridCol, rowSpan, colSpan ->
+                    viewModel.createRoom(floorId, name, gridRow, gridCol, rowSpan, colSpan)
+                },
+                onCreateDevice = { request -> viewModel.createDevice(request) }
+            )
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -77,6 +99,11 @@ fun HomeScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = {
+                        isSetupOpen = true
+                    }) {
+                        Icon(Icons.Default.Add, contentDescription = "Add items")
+                    }
                     IconButton(onClick = onUsageClick) {
                         Icon(Icons.Default.BarChart, contentDescription = "Usage Reports")
                     }
@@ -108,12 +135,15 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    homeState.floors.forEach { f ->
+                    homeState.floors.forEach { floor ->
                         FilterChip(
-                            selected = f.id == selectedFloorId,
-                            onClick = { selectedFloorId = f.id },
-                            label = { Text(f.name) },
-                            leadingIcon = if (f.id == selectedFloorId) {
+                            selected = floor.id == selectedFloorId,
+                            onClick = {
+                                selectedFloorId = floor.id
+                                viewModel.selectFloor(floor.id)
+                            },
+                            label = { Text(floor.name) },
+                            leadingIcon = if (floor.id == selectedFloorId) {
                                 { Icon(Icons.Default.Home, contentDescription = null, modifier = Modifier.height(18.dp)) }
                             } else null
                         )
@@ -121,10 +151,10 @@ fun HomeScreen(
                 }
             }
 
-            if (floor != null) {
+            if (selectedFloor != null) {
                 item {
                     FloorPlanGrid(
-                        rooms = floor.rooms,
+                        rooms = selectedFloor.rooms,
                         devices = floorDevices,
                         onDeviceClick = onDeviceClick
                     )

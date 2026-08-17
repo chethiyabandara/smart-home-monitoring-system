@@ -6,6 +6,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
+import com.scs3311.smart_home_monitoring_app.data.model.DeviceCreationRequest
 import com.scs3311.smart_home_monitoring_app.data.model.DeviceStatus
 import com.scs3311.smart_home_monitoring_app.data.model.DeviceType
 import com.scs3311.smart_home_monitoring_app.data.model.Floor
@@ -58,6 +59,69 @@ class FirebaseSmartHomeRepository : SmartHomeRepository {
         })
         scope.launch { runSafetyMonitor() }
         scope.launch { runScheduleMonitor() }
+    }
+
+    override suspend fun createFloor(name: String): String {
+        val floorId = "floor_${UUID.randomUUID().toString().take(8)}"
+        homeReference.child("floors").child(floorId).setValue(mapOf("name" to name.trim()))
+        return floorId
+    }
+
+    override suspend fun createRoom(
+        floorId: String,
+        name: String,
+        gridRow: Int,
+        gridCol: Int,
+        rowSpan: Int,
+        colSpan: Int
+    ): String {
+        val roomId = "room_${UUID.randomUUID().toString().take(8)}"
+        homeReference.child("rooms").child(roomId).setValue(
+            mapOf(
+                "name" to name.trim(),
+                "floorId" to floorId,
+                "gridRow" to gridRow,
+                "gridCol" to gridCol,
+                "rowSpan" to rowSpan,
+                "colSpan" to colSpan
+            )
+        )
+        return roomId
+    }
+
+    override suspend fun createDevice(request: DeviceCreationRequest): String {
+        val deviceId = "dev_${UUID.randomUUID().toString().take(8)}"
+        val payload = mutableMapOf<String, Any?>(
+            "name" to request.name.trim(),
+            "type" to request.type.name,
+            "roomId" to request.roomId,
+            "floorId" to request.floorId,
+            "status" to request.status.name,
+            "gridRow" to request.gridPosition.row,
+            "gridCol" to request.gridPosition.col,
+            "isSafetyCritical" to request.isSafetyCritical
+        )
+        request.maxOnDurationMinutes?.let { payload["maxOnDurationMinutes"] = it }
+        request.lightSchedule?.let {
+            payload["lightSchedule"] = mapOf(
+                "turnOnHour" to it.turnOnHour,
+                "turnOnMinute" to it.turnOnMinute,
+                "turnOffHour" to it.turnOffHour,
+                "turnOffMinute" to it.turnOffMinute,
+                "enabled" to it.enabled
+            )
+        }
+        if (request.switchNames.isNotEmpty()) {
+            payload["switches"] = request.switchNames.mapIndexed { index, switchName ->
+                "sw${index + 1}" to mapOf("name" to switchName.trim(), "status" to DeviceStatus.OFF.name)
+            }.toMap()
+        }
+        request.cameraSnapshotUrl?.let { payload["cameraSnapshotUrl"] = it }
+        if (request.status == DeviceStatus.ON) {
+            payload["turnedOnAtMillis"] = ServerValue.TIMESTAMP
+        }
+        homeReference.child("devices").child(deviceId).setValue(payload)
+        return deviceId
     }
 
     override suspend fun toggleDevice(deviceId: String) {

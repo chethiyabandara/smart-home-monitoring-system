@@ -1,8 +1,11 @@
 package com.scs3311.smart_home_monitoring_app.data.repository
 
 import com.scs3311.smart_home_monitoring_app.data.DemoData
+import com.scs3311.smart_home_monitoring_app.data.model.DeviceCreationRequest
 import com.scs3311.smart_home_monitoring_app.data.model.DeviceStatus
 import com.scs3311.smart_home_monitoring_app.data.model.DeviceType
+import com.scs3311.smart_home_monitoring_app.data.model.Floor
+import com.scs3311.smart_home_monitoring_app.data.model.Room
 import com.scs3311.smart_home_monitoring_app.data.model.HomeState
 import com.scs3311.smart_home_monitoring_app.data.model.LightSchedule
 import com.scs3311.smart_home_monitoring_app.data.model.SafetyAlert
@@ -37,6 +40,53 @@ class DemoSmartHomeRepository : SmartHomeRepository {
     init {
         scope.launch { runSafetyMonitor() }
         scope.launch { runLightScheduleWorker() }
+    }
+
+    override suspend fun createFloor(name: String): String {
+        val floorId = "floor_${UUID.randomUUID().toString().take(8)}"
+        val floor = Floor(id = floorId, name = name.trim(), rooms = emptyList())
+        _homeState.value = _homeState.value.copy(floors = _homeState.value.floors + floor)
+        return floorId
+    }
+
+    override suspend fun createRoom(
+        floorId: String,
+        name: String,
+        gridRow: Int,
+        gridCol: Int,
+        rowSpan: Int,
+        colSpan: Int
+    ): String {
+        val roomId = "room_${UUID.randomUUID().toString().take(8)}"
+        val room = Room(roomId, name.trim(), gridRow, gridCol, rowSpan, colSpan)
+        _homeState.value = _homeState.value.copy(
+            floors = _homeState.value.floors.map { floor ->
+                if (floor.id == floorId) floor.copy(rooms = floor.rooms + room) else floor
+            }
+        )
+        return roomId
+    }
+
+    override suspend fun createDevice(request: DeviceCreationRequest): String {
+        val deviceId = "dev_${UUID.randomUUID().toString().take(8)}"
+        val device = SmartDevice(
+            id = deviceId,
+            name = request.name.trim(),
+            type = request.type,
+            roomId = request.roomId,
+            floorId = request.floorId,
+            status = request.status,
+            gridPosition = request.gridPosition,
+            switches = request.switchNames.filter { it.isNotBlank() }.mapIndexed { index, switchName ->
+                SwitchState(id = "sw${index + 1}", name = switchName.trim(), status = DeviceStatus.OFF)
+            },
+            maxOnDurationMinutes = request.maxOnDurationMinutes,
+            lightSchedule = request.lightSchedule,
+            cameraSnapshotUrl = request.cameraSnapshotUrl,
+            isSafetyCritical = request.isSafetyCritical
+        )
+        _homeState.value = _homeState.value.copy(devices = _homeState.value.devices + device)
+        return deviceId
     }
 
     override suspend fun toggleDevice(deviceId: String) {

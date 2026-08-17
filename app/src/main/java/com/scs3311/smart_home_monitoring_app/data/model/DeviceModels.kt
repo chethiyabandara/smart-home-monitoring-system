@@ -68,6 +68,20 @@ data class SmartDevice(
     val isSafetyCritical: Boolean = false
 )
 
+data class DeviceCreationRequest(
+    val name: String,
+    val type: DeviceType,
+    val floorId: String,
+    val roomId: String,
+    val gridPosition: GridPosition,
+    val status: DeviceStatus = DeviceStatus.OFF,
+    val switchNames: List<String> = emptyList(),
+    val maxOnDurationMinutes: Int? = null,
+    val lightSchedule: LightSchedule? = null,
+    val cameraSnapshotUrl: String? = null,
+    val isSafetyCritical: Boolean = false
+)
+
 data class UsageLog(
     val id: String,
     val deviceId: String,
